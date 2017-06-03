@@ -13,6 +13,8 @@ set( CMAKE_AUTOMOC ON )
 set( CMAKE_CXX_STANDARD 14 )
 set( CMAKE_CXX_STANDARD_REQUIRED 14 )
 
+add_subdirectory( 3rdparty )
+
 add_subdirectory( yans-engine )
 add_subdirectory( yans-launcher )
 

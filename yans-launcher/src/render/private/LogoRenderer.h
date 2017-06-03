@@ -2,11 +2,8 @@
 #ifndef LOGORENDERER_H
 #define LOGORENDERER_H
 
-#include <QtGui/qmatrix4x4.h>
-#include <QtGui/qopenglshaderprogram.h>
-#include <QtGui/qvector3d.h>
-
-#include <QTime>
+#include <QOpenGLShaderProgram>
+#include <QVector3D>
 #include <QVector>
 
 class LogoRenderer
@@ -17,23 +14,26 @@ public:
     ~LogoRenderer();
 
     void render();
-    void initialize();
 
 private:
-    qreal m_fAngle;
-    qreal m_fScale;
+    GLfloat m_Angle;
+    GLfloat m_Scale;
 
     void paintQtLogo();
     void createGeometry();
-    void quad( qreal x1, qreal y1, qreal x2, qreal y2, qreal x3, qreal y3, qreal x4, qreal y4 );
-    void extrude( qreal x1, qreal y1, qreal x2, qreal y2 );
+    void quad( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat x3, GLfloat y3, GLfloat x4, GLfloat y4 );
+    void extrude( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 );
+    void initialize();
+    void beforeRender();
+    void afterRender();
 
-    QVector< QVector3D > vertices;
-    QVector< QVector3D > normals;
-    QOpenGLShaderProgram program1;
+    QVector< QVector3D > m_Vertices;
+    QVector< QVector3D > m_Normals;
+    QOpenGLShaderProgram m_ShaderProgram;
     int vertexAttr1;
     int normalAttr1;
     int matrixUniform1;
+    bool m_GLInit;
 };
 
 #endif // LOGORENDERER_H

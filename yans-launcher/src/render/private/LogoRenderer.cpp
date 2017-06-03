@@ -1,11 +1,10 @@
 #include "LogoRenderer.h"
 
-#include <QPaintEngine>
-#include <QPainter>
+#include <QMatrix4x4>
 
 #include <cmath>
 
-LogoRenderer::LogoRenderer()
+LogoRenderer::LogoRenderer() : m_GLInit( false )
 {
 }
 
@@ -15,20 +14,156 @@ LogoRenderer::~LogoRenderer()
 
 void LogoRenderer::paintQtLogo()
 {
-    program1.enableAttributeArray( normalAttr1 );
-    program1.enableAttributeArray( vertexAttr1 );
-    program1.setAttributeArray( vertexAttr1, vertices.constData() );
-    program1.setAttributeArray( normalAttr1, normals.constData() );
-    glDrawArrays( GL_TRIANGLES, 0, vertices.size() );
-    program1.disableAttributeArray( normalAttr1 );
-    program1.disableAttributeArray( vertexAttr1 );
+    m_ShaderProgram.enableAttributeArray( normalAttr1 );
+    m_ShaderProgram.enableAttributeArray( vertexAttr1 );
+    m_ShaderProgram.setAttributeArray( vertexAttr1, m_Vertices.constData() );
+    m_ShaderProgram.setAttributeArray( normalAttr1, m_Normals.constData() );
+    glDrawArrays( GL_TRIANGLES, 0, m_Vertices.size() );
+    m_ShaderProgram.disableAttributeArray( normalAttr1 );
+    m_ShaderProgram.disableAttributeArray( vertexAttr1 );
+}
+
+void LogoRenderer::render()
+{
+    beforeRender();
+
+    m_Angle += 1.0f;
+
+    QMatrix4x4 modelview;
+    modelview.rotate( m_Angle, 0.0f, 1.0f, 0.0f );
+    modelview.rotate( m_Angle, 1.0f, 0.0f, 0.0f );
+    modelview.rotate( m_Angle, 0.0f, 0.0f, 1.0f );
+    modelview.scale( m_Scale );
+    modelview.translate( 0.0f, -0.2f, 0.0f );
+
+    m_ShaderProgram.bind();
+    m_ShaderProgram.setUniformValue( matrixUniform1, modelview );
+    paintQtLogo();
+    m_ShaderProgram.release();
+
+    afterRender();
+}
+
+void LogoRenderer::createGeometry()
+{
+    m_Vertices.clear();
+    m_Normals.clear();
+
+    constexpr GLfloat x1 = +0.06f;
+    constexpr GLfloat y1 = -0.14f;
+    constexpr GLfloat x2 = +0.14f;
+    constexpr GLfloat y2 = -0.06f;
+    constexpr GLfloat x3 = +0.08f;
+    constexpr GLfloat y3 = +0.00f;
+    constexpr GLfloat x4 = +0.30f;
+    constexpr GLfloat y4 = +0.22f;
+
+    quad( x1, y1, x2, y2, y2, x2, y1, x1 );
+    quad( x3, y3, x4, y4, y4, x4, y3, x3 );
+
+    extrude( x1, y1, x2, y2 );
+    extrude( x2, y2, y2, x2 );
+    extrude( y2, x2, y1, x1 );
+    extrude( y1, x1, x1, y1 );
+    extrude( x3, y3, x4, y4 );
+    extrude( x4, y4, y4, x4 );
+    extrude( y4, x4, y3, x3 );
+
+    constexpr GLfloat Pi = 3.14159f;
+    constexpr int NumSectors = 100;
+
+    for( int i = 0; i < NumSectors; ++i )
+    {
+        GLfloat angle1 = ( i * 2 * Pi ) / NumSectors;
+        GLfloat x5 = 0.30f * std::sin( angle1 );
+        GLfloat y5 = 0.30f * std::cos( angle1 );
+        GLfloat x6 = 0.20f * std::sin( angle1 );
+        GLfloat y6 = 0.20f * std::cos( angle1 );
+
+        GLfloat angle2 = ( ( i + 1 ) * 2 * Pi ) / NumSectors;
+        GLfloat x7 = 0.20f * std::sin( angle2 );
+        GLfloat y7 = 0.20f * std::cos( angle2 );
+        GLfloat x8 = 0.30f * std::sin( angle2 );
+        GLfloat y8 = 0.30f * std::cos( angle2 );
+
+        quad( x5, y5, x6, y6, x7, y7, x8, y8 );
+
+        extrude( x6, y6, x7, y7 );
+        extrude( x8, y8, x5, y5 );
+    }
+
+    for( auto &vertex : m_Vertices )
+    {
+        vertex *= 2.0f;
+    }
+}
+
+void LogoRenderer::quad( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat x3, GLfloat y3, GLfloat x4,
+                         GLfloat y4 )
+{
+    m_Vertices << QVector3D( x1, y1, -0.05f );
+    m_Vertices << QVector3D( x2, y2, -0.05f );
+    m_Vertices << QVector3D( x4, y4, -0.05f );
+
+    m_Vertices << QVector3D( x3, y3, -0.05f );
+    m_Vertices << QVector3D( x4, y4, -0.05f );
+    m_Vertices << QVector3D( x2, y2, -0.05f );
+
+    QVector3D n = QVector3D::normal( QVector3D( x2 - x1, y2 - y1, 0.0f ), QVector3D( x4 - x1, y4 - y1, 0.0f ) );
+
+    m_Normals << n;
+    m_Normals << n;
+    m_Normals << n;
+
+    m_Normals << n;
+    m_Normals << n;
+    m_Normals << n;
+
+    m_Vertices << QVector3D( x4, y4, 0.05f );
+    m_Vertices << QVector3D( x2, y2, 0.05f );
+    m_Vertices << QVector3D( x1, y1, 0.05f );
+
+    m_Vertices << QVector3D( x2, y2, 0.05f );
+    m_Vertices << QVector3D( x4, y4, 0.05f );
+    m_Vertices << QVector3D( x3, y3, 0.05f );
+
+    n = QVector3D::normal( QVector3D( x2 - x4, y2 - y4, 0.0f ), QVector3D( x1 - x4, y1 - y4, 0.0f ) );
+
+    m_Normals << n;
+    m_Normals << n;
+    m_Normals << n;
+
+    m_Normals << n;
+    m_Normals << n;
+    m_Normals << n;
+}
+
+void LogoRenderer::extrude( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 )
+{
+    m_Vertices << QVector3D( x1, y1, +0.05f );
+    m_Vertices << QVector3D( x2, y2, +0.05f );
+    m_Vertices << QVector3D( x1, y1, -0.05f );
+
+    m_Vertices << QVector3D( x2, y2, -0.05f );
+    m_Vertices << QVector3D( x1, y1, -0.05f );
+    m_Vertices << QVector3D( x2, y2, +0.05f );
+
+    const QVector3D n = QVector3D::normal( QVector3D( x2 - x1, y2 - y1, 0.0f ), QVector3D( 0.0f, 0.0f, -0.1f ) );
+
+    m_Normals << n;
+    m_Normals << n;
+    m_Normals << n;
+
+    m_Normals << n;
+    m_Normals << n;
+    m_Normals << n;
 }
 
 void LogoRenderer::initialize()
 {
     glClearColor( 0.1f, 0.1f, 0.2f, 1.0f );
 
-    QOpenGLShader *vshader1 = new QOpenGLShader( QOpenGLShader::Vertex, &program1 );
+    QOpenGLShader *vshader1 = new QOpenGLShader( QOpenGLShader::Vertex, &m_ShaderProgram );
     const char *vsrc1 = "attribute highp vec4 vertex;\n"
                         "attribute mediump vec3 normal;\n"
                         "uniform mediump mat4 matrix;\n"
@@ -44,7 +179,7 @@ void LogoRenderer::initialize()
                         "}\n";
     vshader1->compileSourceCode( vsrc1 );
 
-    QOpenGLShader *fshader1 = new QOpenGLShader( QOpenGLShader::Fragment, &program1 );
+    QOpenGLShader *fshader1 = new QOpenGLShader( QOpenGLShader::Fragment, &m_ShaderProgram );
     const char *fsrc1 = "varying mediump vec4 color;\n"
                         "void main(void)\n"
                         "{\n"
@@ -52,27 +187,34 @@ void LogoRenderer::initialize()
                         "}\n";
     fshader1->compileSourceCode( fsrc1 );
 
-    program1.addShader( vshader1 );
-    program1.addShader( fshader1 );
-    program1.link();
+    m_ShaderProgram.addShader( vshader1 );
+    m_ShaderProgram.addShader( fshader1 );
+    m_ShaderProgram.link();
 
-    vertexAttr1 = program1.attributeLocation( "vertex" );
-    normalAttr1 = program1.attributeLocation( "normal" );
-    matrixUniform1 = program1.uniformLocation( "matrix" );
+    vertexAttr1 = m_ShaderProgram.attributeLocation( "vertex" );
+    normalAttr1 = m_ShaderProgram.attributeLocation( "normal" );
+    matrixUniform1 = m_ShaderProgram.uniformLocation( "matrix" );
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    m_fAngle = 0;
-    m_fScale = 1;
+    m_Angle = 0.0f;
+    m_Scale = 1.0f;
     createGeometry();
+
+    m_GLInit = true;
 }
 
-void LogoRenderer::render()
+void LogoRenderer::beforeRender()
 {
+    if( Q_UNLIKELY( !m_GLInit ) )
+    {
+        initialize();
+    }
+
     glDepthMask( true );
 
-    glClearColor( 0.5f, 0.5f, 0.7f, 1.0f );
+    glClearColor( 0.0f, 0.0f, 1.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -82,133 +224,10 @@ void LogoRenderer::render()
     glCullFace( GL_FRONT );
     glEnable( GL_CULL_FACE );
     glEnable( GL_DEPTH_TEST );
+}
 
-    QMatrix4x4 modelview;
-    modelview.rotate( m_fAngle, 0.0f, 1.0f, 0.0f );
-    modelview.rotate( m_fAngle, 1.0f, 0.0f, 0.0f );
-    modelview.rotate( m_fAngle, 0.0f, 0.0f, 1.0f );
-    modelview.scale( m_fScale );
-    modelview.translate( 0.0f, -0.2f, 0.0f );
-
-    program1.bind();
-    program1.setUniformValue( matrixUniform1, modelview );
-    paintQtLogo();
-    program1.release();
-
+void LogoRenderer::afterRender()
+{
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
-
-    m_fAngle += 1.0f;
-}
-
-void LogoRenderer::createGeometry()
-{
-    vertices.clear();
-    normals.clear();
-
-    qreal x1 = +0.06f;
-    qreal y1 = -0.14f;
-    qreal x2 = +0.14f;
-    qreal y2 = -0.06f;
-    qreal x3 = +0.08f;
-    qreal y3 = +0.00f;
-    qreal x4 = +0.30f;
-    qreal y4 = +0.22f;
-
-    quad( x1, y1, x2, y2, y2, x2, y1, x1 );
-    quad( x3, y3, x4, y4, y4, x4, y3, x3 );
-
-    extrude( x1, y1, x2, y2 );
-    extrude( x2, y2, y2, x2 );
-    extrude( y2, x2, y1, x1 );
-    extrude( y1, x1, x1, y1 );
-    extrude( x3, y3, x4, y4 );
-    extrude( x4, y4, y4, x4 );
-    extrude( y4, x4, y3, x3 );
-
-    const qreal Pi = 3.14159f;
-    const int NumSectors = 100;
-
-    for( int i = 0; i < NumSectors; ++i )
-    {
-        qreal angle1 = ( i * 2 * Pi ) / NumSectors;
-        qreal x5 = 0.30 * sin( angle1 );
-        qreal y5 = 0.30 * cos( angle1 );
-        qreal x6 = 0.20 * sin( angle1 );
-        qreal y6 = 0.20 * cos( angle1 );
-
-        qreal angle2 = ( ( i + 1 ) * 2 * Pi ) / NumSectors;
-        qreal x7 = 0.20 * sin( angle2 );
-        qreal y7 = 0.20 * cos( angle2 );
-        qreal x8 = 0.30 * sin( angle2 );
-        qreal y8 = 0.30 * cos( angle2 );
-
-        quad( x5, y5, x6, y6, x7, y7, x8, y8 );
-
-        extrude( x6, y6, x7, y7 );
-        extrude( x8, y8, x5, y5 );
-    }
-
-    for( int i = 0; i < vertices.size(); i++ )
-        vertices[i] *= 2.0f;
-}
-
-void LogoRenderer::quad( qreal x1, qreal y1, qreal x2, qreal y2, qreal x3, qreal y3, qreal x4, qreal y4 )
-{
-    vertices << QVector3D( x1, y1, -0.05f );
-    vertices << QVector3D( x2, y2, -0.05f );
-    vertices << QVector3D( x4, y4, -0.05f );
-
-    vertices << QVector3D( x3, y3, -0.05f );
-    vertices << QVector3D( x4, y4, -0.05f );
-    vertices << QVector3D( x2, y2, -0.05f );
-
-    QVector3D n = QVector3D::normal( QVector3D( x2 - x1, y2 - y1, 0.0f ), QVector3D( x4 - x1, y4 - y1, 0.0f ) );
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    vertices << QVector3D( x4, y4, 0.05f );
-    vertices << QVector3D( x2, y2, 0.05f );
-    vertices << QVector3D( x1, y1, 0.05f );
-
-    vertices << QVector3D( x2, y2, 0.05f );
-    vertices << QVector3D( x4, y4, 0.05f );
-    vertices << QVector3D( x3, y3, 0.05f );
-
-    n = QVector3D::normal( QVector3D( x2 - x4, y2 - y4, 0.0f ), QVector3D( x1 - x4, y1 - y4, 0.0f ) );
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    normals << n;
-    normals << n;
-    normals << n;
-}
-
-void LogoRenderer::extrude( qreal x1, qreal y1, qreal x2, qreal y2 )
-{
-    vertices << QVector3D( x1, y1, +0.05f );
-    vertices << QVector3D( x2, y2, +0.05f );
-    vertices << QVector3D( x1, y1, -0.05f );
-
-    vertices << QVector3D( x2, y2, -0.05f );
-    vertices << QVector3D( x1, y1, -0.05f );
-    vertices << QVector3D( x2, y2, +0.05f );
-
-    QVector3D n = QVector3D::normal( QVector3D( x2 - x1, y2 - y1, 0.0f ), QVector3D( 0.0f, 0.0f, -0.1f ) );
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    normals << n;
-    normals << n;
-    normals << n;
 }

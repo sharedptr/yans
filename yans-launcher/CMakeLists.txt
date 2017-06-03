@@ -2,6 +2,9 @@ cmake_minimum_required( VERSION 3.7 )
 
 project( yans-launcher CXX )
 
+find_package( glm 0.9.8 REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Quick REQUIRED )
+
 set( SOURCES
     src/main.cpp
     src/render/ThreadRenderer.cpp
@@ -9,8 +12,6 @@ set( SOURCES
     src/render/private/TextureNode.cpp
     src/render/private/LogoRenderer.cpp
 )
-
-find_package( Qt5 COMPONENTS Core Gui Quick REQUIRED )
 
 qt5_add_resources( RESOURCES yans-launcher.qrc )
 

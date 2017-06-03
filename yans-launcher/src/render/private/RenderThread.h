@@ -31,7 +31,7 @@ public slots:
     void shutDown();
 
 signals:
-    void textureReady( int id, const QSize &size );
+    void textureReady( uint id, const QSize &size );
 
 private:
     QOpenGLFramebufferObject *m_renderFbo;

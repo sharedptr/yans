@@ -33,4 +33,5 @@
 
 # Local user files
 *.user
+*.autosave
 *~

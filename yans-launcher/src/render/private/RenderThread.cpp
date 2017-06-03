@@ -1,7 +1,7 @@
 #include "RenderThread.h"
 
-#include "render/private/LogoRenderer.h"
 #include "render/ThreadRenderer.h"
+#include "render/private/LogoRenderer.h"
 
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
@@ -26,7 +26,6 @@ void RenderThread::renderNext()
         m_renderFbo = new QOpenGLFramebufferObject( m_size, format );
         m_displayFbo = new QOpenGLFramebufferObject( m_size, format );
         m_logoRenderer = new LogoRenderer();
-        m_logoRenderer->initialize();
     }
 
     m_renderFbo->bind();
