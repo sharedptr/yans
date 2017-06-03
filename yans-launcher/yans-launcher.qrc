@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/yans/ui">
+        <file>qml/main.qml</file>
+    </qresource>
+</RCC>
