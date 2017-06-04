@@ -11,14 +11,14 @@
 #   define YANS_ENGINE_EXPORT Q_DECL_IMPORT
 #endif
 
-#define YANS_NS_B namespace yans { namespace engine {
-#define YANS_NS_E } }
+#define YANS_ENS_B namespace yans { namespace engine {
+#define YANS_ENS_E } }
 
-#define YANS_NS_B1( x ) YANS_NS_B namespace x {
-#define YANS_NS_E1( x ) YANS_NS_E }
+#define YANS_ENS_B1( x ) YANS_ENS_B namespace x {
+#define YANS_ENS_E1( x ) YANS_ENS_E }
 
-#define YANS_NS_B2( x, y ) YANS_NS_B namespace x { namespace y {
-#define YANS_NS_E2( x, y ) YANS_NS_E } }
+#define YANS_ENS_B2( x, y ) YANS_ENS_B namespace x { namespace y {
+#define YANS_ENS_E2( x, y ) YANS_ENS_E } }
 // clang-format on
 
 #endif // YANS_ENGINE_CONFIG_H_

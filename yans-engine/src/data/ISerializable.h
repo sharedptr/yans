@@ -6,7 +6,7 @@
 
 class QJsonObject;
 
-YANS_NS_B1( data )
+YANS_ENS_B1( data )
 
 class YANS_ENGINE_EXPORT ISerializable
 {
@@ -18,6 +18,6 @@ protected:
     virtual ~ISerializable();
 };
 
-YANS_NS_E1( data )
+YANS_ENS_E1( data )
 
 #endif // YANS_ENGINE_DATA_ISERIALIZABLE_H_

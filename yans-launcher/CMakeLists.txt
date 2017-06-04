@@ -7,10 +7,6 @@ find_package( Qt5 COMPONENTS Core Gui Quick REQUIRED )
 
 set( SOURCES
     src/main.cpp
-    src/render/ThreadRenderer.cpp
-    src/render/private/RenderThread.cpp
-    src/render/private/TextureNode.cpp
-    src/render/private/LogoRenderer.cpp
 )
 
 qt5_add_resources( RESOURCES yans-launcher.qrc )

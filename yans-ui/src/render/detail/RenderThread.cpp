@@ -1,17 +1,23 @@
 #include "RenderThread.h"
 
-#include "render/ThreadRenderer.h"
-#include "render/private/LogoRenderer.h"
+#include "render/detail/GameRenderer.h"
 
+#include <QGuiApplication>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
 
-RenderThread::RenderThread( const QSize &size )
-    : surface( 0 ), context( 0 ), m_renderFbo( 0 ), m_displayFbo( 0 ), m_logoRenderer( 0 ), m_size( size )
+YANS_UNS_B2( render, detail )
+
+RenderThread::RenderThread( const QSize& size )
+    : surface( nullptr ),
+      context( nullptr ),
+      m_renderFbo( nullptr ),
+      m_displayFbo( nullptr ),
+      m_logoRenderer( nullptr ),
+      m_size( size )
 {
-    ThreadRenderer::threads << this;
 }
 
 void RenderThread::renderNext()
@@ -25,7 +31,7 @@ void RenderThread::renderNext()
         format.setAttachment( QOpenGLFramebufferObject::CombinedDepthStencil );
         m_renderFbo = new QOpenGLFramebufferObject( m_size, format );
         m_displayFbo = new QOpenGLFramebufferObject( m_size, format );
-        m_logoRenderer = new LogoRenderer();
+        m_logoRenderer = new GameRenderer();
     }
 
     m_renderFbo->bind();
@@ -46,17 +52,23 @@ void RenderThread::renderNext()
 
 void RenderThread::shutDown()
 {
-    context->makeCurrent( surface );
-    delete m_renderFbo;
-    delete m_displayFbo;
-    delete m_logoRenderer;
-    context->doneCurrent();
-    delete context;
+    if( context != nullptr )
+    {
+        context->makeCurrent( surface );
+        delete m_renderFbo;
+        delete m_displayFbo;
+        delete m_logoRenderer;
+        context->doneCurrent();
+        delete context;
+        context = nullptr;
 
-    // schedule this to be deleted only after we're done cleaning up
-    surface->deleteLater();
+        // schedule this to be deleted only after we're done cleaning up
+        surface->deleteLater();
 
-    // Stop event processing, move the thread to GUI and make sure it is deleted.
+        // Stop event processing, move the thread to GUI and make sure it is deleted.
+    }
     exit();
     moveToThread( QGuiApplication::instance()->thread() );
 }
+
+YANS_UNS_E2( render, detail )

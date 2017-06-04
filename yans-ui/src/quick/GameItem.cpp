@@ -1,7 +1,7 @@
-#include "ThreadRenderer.h"
+#include "GameItem.h"
 
-#include "render/private/RenderThread.h"
-#include "render/private/TextureNode.h"
+#include "render/detail/RenderThread.h"
+#include "render/detail/TextureNode.h"
 
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
@@ -14,15 +14,21 @@
 #include <QtQuick/QQuickWindow>
 #include <qsgsimpletexturenode.h>
 
-QList< QThread * > ThreadRenderer::threads;
+YANS_UNS_B1( quick )
 
-ThreadRenderer::ThreadRenderer() : m_renderThread( nullptr )
+GameItem::GameItem() : m_renderThread( new render::detail::RenderThread( QSize( 1024, 1024 ) ) )
 {
     setFlag( ItemHasContents, true );
-    m_renderThread = new RenderThread( QSize( 1024, 1024 ) );
 }
 
-void ThreadRenderer::ready()
+GameItem::~GameItem()
+{
+    emit shutdown();
+    m_renderThread->wait();
+    delete m_renderThread;
+}
+
+void GameItem::ready()
 {
     m_renderThread->surface = new QOffscreenSurface();
     m_renderThread->surface->setFormat( m_renderThread->context->format() );
@@ -30,20 +36,21 @@ void ThreadRenderer::ready()
 
     m_renderThread->moveToThread( m_renderThread );
 
-    connect( window(), &QQuickWindow::sceneGraphInvalidated, m_renderThread, &RenderThread::shutDown,
+    connect( window(), &QQuickWindow::sceneGraphInvalidated, m_renderThread, &render::detail::RenderThread::shutDown,
              Qt::QueuedConnection );
+    connect( this, &GameItem::shutdown, m_renderThread, &render::detail::RenderThread::shutDown, Qt::QueuedConnection );
 
     m_renderThread->start();
     update();
 }
 
-QSGNode *ThreadRenderer::updatePaintNode( QSGNode *oldNode, UpdatePaintNodeData * )
+QSGNode* GameItem::updatePaintNode( QSGNode* oldNode, UpdatePaintNodeData* )
 {
-    TextureNode *node = static_cast< TextureNode * >( oldNode );
+    render::detail::TextureNode* node = static_cast< render::detail::TextureNode* >( oldNode );
 
     if( !m_renderThread->context )
     {
-        QOpenGLContext *current = window()->openglContext();
+        QOpenGLContext* current = window()->openglContext();
         // Some GL implementations requres that the currently bound context is
         // made non-current before we set up sharing, so we doneCurrent here
         // and makeCurrent down below while setting up our own context.
@@ -63,7 +70,7 @@ QSGNode *ThreadRenderer::updatePaintNode( QSGNode *oldNode, UpdatePaintNodeData 
 
     if( !node )
     {
-        node = new TextureNode( window() );
+        node = new render::detail::TextureNode( window() );
 
         /* Set up connections to get the production of FBO textures in sync with vsync on the
          * rendering thread.
@@ -79,10 +86,14 @@ QSGNode *ThreadRenderer::updatePaintNode( QSGNode *oldNode, UpdatePaintNodeData 
          *
          * This FBO rendering pipeline is throttled by vsync on the scene graph rendering thread.
          */
-        connect( m_renderThread, &RenderThread::textureReady, node, &TextureNode::newTexture, Qt::DirectConnection );
-        connect( node, &TextureNode::pendingNewTexture, window(), &QQuickWindow::update, Qt::QueuedConnection );
-        connect( window(), &QQuickWindow::beforeRendering, node, &TextureNode::prepareNode, Qt::DirectConnection );
-        connect( node, &TextureNode::textureInUse, m_renderThread, &RenderThread::renderNext, Qt::QueuedConnection );
+        connect( m_renderThread, &render::detail::RenderThread::textureReady, node,
+                 &render::detail::TextureNode::newTexture, Qt::DirectConnection );
+        connect( node, &render::detail::TextureNode::pendingNewTexture, window(), &QQuickWindow::update,
+                 Qt::QueuedConnection );
+        connect( window(), &QQuickWindow::beforeRendering, node, &render::detail::TextureNode::prepareNode,
+                 Qt::DirectConnection );
+        connect( node, &render::detail::TextureNode::textureInUse, m_renderThread,
+                 &render::detail::RenderThread::renderNext, Qt::QueuedConnection );
 
         // Get the production of FBO textures started..
         QMetaObject::invokeMethod( m_renderThread, "renderNext", Qt::QueuedConnection );
@@ -92,3 +103,5 @@ QSGNode *ThreadRenderer::updatePaintNode( QSGNode *oldNode, UpdatePaintNodeData 
 
     return node;
 }
+
+YANS_UNS_E1( quick )

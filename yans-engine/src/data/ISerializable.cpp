@@ -1,9 +1,9 @@
 #include "ISerializable.h"
 
-YANS_NS_B1( data )
+YANS_ENS_B1( data )
 
 ISerializable::~ISerializable()
 {
 }
 
-YANS_NS_E1( data )
+YANS_ENS_E1( data )

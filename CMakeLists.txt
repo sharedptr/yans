@@ -16,5 +16,6 @@ set( CMAKE_CXX_STANDARD_REQUIRED 14 )
 add_subdirectory( 3rdparty )
 
 add_subdirectory( yans-engine )
+add_subdirectory( yans-ui )
 add_subdirectory( yans-launcher )
 

@@ -1,17 +1,20 @@
 #pragma once
-#ifndef LOGORENDERER_H
-#define LOGORENDERER_H
+#ifndef YANS_UI_RENDER_DETAIL_GAMERENDERER_H_
+#define YANS_UI_RENDER_DETAIL_GAMERENDERER_H_
+
+#include "yans-ui.h"
 
 #include <QOpenGLShaderProgram>
 #include <QVector3D>
 #include <QVector>
 
-class LogoRenderer
-{
+YANS_UNS_B2( render, detail )
 
+class Q_DECL_HIDDEN GameRenderer
+{
 public:
-    LogoRenderer();
-    ~LogoRenderer();
+    GameRenderer();
+    ~GameRenderer();
 
     void render();
 
@@ -36,4 +39,6 @@ private:
     bool m_GLInit;
 };
 
-#endif // LOGORENDERER_H
+YANS_UNS_E2( render, detail )
+
+#endif // YANS_UI_RENDER_DETAIL_GAMERENDERER_H_

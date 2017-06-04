@@ -1,8 +1,11 @@
 #include "TextureNode.h"
 
 #include <QMutexLocker>
+#include <QQuickWindow>
 
-TextureNode::TextureNode( QQuickWindow *window ) : m_id( 0 ), m_size( 0, 0 ), m_texture( 0 ), m_window( window )
+YANS_UNS_B2( render, detail )
+
+TextureNode::TextureNode( QQuickWindow* window ) : m_id( 0 ), m_size( 0, 0 ), m_texture( 0 ), m_window( window )
 {
     // Our texture node must have a texture, so use the default 0 texture.
     m_texture = m_window->createTextureFromId( 0, QSize( 1, 1 ) );
@@ -15,7 +18,7 @@ TextureNode::~TextureNode()
     delete m_texture;
 }
 
-void TextureNode::newTexture( uint id, const QSize &size )
+void TextureNode::newTexture( uint id, const QSize& size )
 {
     {
         QMutexLocker locker( &m_mutex );
@@ -53,3 +56,5 @@ void TextureNode::prepareNode()
         emit textureInUse();
     }
 }
+
+YANS_UNS_E2( render, detail )

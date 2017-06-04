@@ -8,7 +8,7 @@
 
 #include <vector>
 
-YANS_NS_B2( biota, genos )
+YANS_ENS_B2( biota, genos )
 
 using AllelesList = std::vector< Allele >;
 
@@ -28,6 +28,6 @@ private:
     // Genotype* m_Species;
 };
 
-YANS_NS_E2( biota, genos )
+YANS_ENS_E2( biota, genos )
 
 #endif // YANS_ENGINE_BIOTA_GENOS_GENOTYPE_H_

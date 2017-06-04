@@ -4,7 +4,7 @@
 
 #include "yans-engine.h"
 
-YANS_NS_B1( biota )
+YANS_ENS_B1( biota )
 
 class YANS_ENGINE_EXPORT Phenotype
 {
@@ -12,6 +12,6 @@ public:
     Phenotype();
 };
 
-YANS_NS_E1( biota )
+YANS_ENS_E1( biota )
 
 #endif // YANS_ENGINE_BIOTA_PHENOTYPE_H_

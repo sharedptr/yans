@@ -1,0 +1,2 @@
+module yans.ui
+plugin @PROJECT_NAME@ @yans-ui_BINARY_DIR@

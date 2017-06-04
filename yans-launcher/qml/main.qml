@@ -1,12 +1,12 @@
 import QtQuick 2.0
 
-import SceneGraphRendering 1.0
+import yans.ui 1.0
 
 Item {
     width: 1280
     height: 720
 
-    Renderer {
+    GameItem {
         id: renderer
         anchors.fill: parent
         opacity: 0

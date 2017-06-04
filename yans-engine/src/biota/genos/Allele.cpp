@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-YANS_NS_B2( biota, genos )
+YANS_ENS_B2( biota, genos )
 
 Allele::Allele( const Gene& one, const Gene& two ) : m_GeneOne( one ), m_GeneTwo( two ), m_Type( one.type() )
 {
@@ -28,4 +28,4 @@ TypeGene Allele::type() const noexcept
     return m_Type;
 }
 
-YANS_NS_E2( biota, genos )
+YANS_ENS_E2( biota, genos )

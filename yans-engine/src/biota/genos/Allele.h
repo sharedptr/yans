@@ -7,7 +7,7 @@
 #include "biota/genos/Gene.h"
 #include "biota/genos/TypeGene.h"
 
-YANS_NS_B2( biota, genos )
+YANS_ENS_B2( biota, genos )
 
 class YANS_ENGINE_EXPORT Allele
 {
@@ -27,6 +27,6 @@ private:
     TypeGene m_Type;
 };
 
-YANS_NS_E2( biota, genos )
+YANS_ENS_E2( biota, genos )
 
 #endif // YANS_ENGINE_BIOTA_GENOS_ALLELE_H_

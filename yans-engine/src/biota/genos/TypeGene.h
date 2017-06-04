@@ -4,7 +4,7 @@
 
 #include "yans-engine.h"
 
-YANS_NS_B2( biota, genos )
+YANS_ENS_B2( biota, genos )
 
 /**
  * @brief Type of genetic information about phenotype
@@ -29,6 +29,6 @@ enum class TypeGene : quint8
     TypeGeneTotalSize
 };
 
-YANS_NS_E2( biota, genos )
+YANS_ENS_E2( biota, genos )
 
 #endif // YANS_ENGINE_BIOTA_GENOS_TYPEGENE_H_

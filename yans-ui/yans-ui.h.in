@@ -1,0 +1,28 @@
+#pragma once
+#ifndef YANS_UI_CONFIG_H_
+#define YANS_UI_CONFIG_H_
+
+#include <QtGlobal>
+
+// clang-format off
+#if defined( YANS_BUILD_UI_LIB )
+#   define YANS_UI_EXPORT Q_DECL_EXPORT
+#else
+#   define YANS_UI_EXPORT Q_DECL_IMPORT
+#endif
+
+#define YANS_UNS_B namespace yans { namespace ui {
+#define YANS_UNS_E } }
+
+#define YANS_UNS_B1( x ) YANS_UNS_B namespace x {
+#define YANS_UNS_E1( x ) YANS_UNS_E }
+
+#define YANS_UNS_B2( x, y ) YANS_UNS_B namespace x { namespace y {
+#define YANS_UNS_E2( x, y ) YANS_UNS_E } }
+// clang-format on
+
+#define YANS_UI_VERSION_MAJOR @YANS_UI_VERSION_MAJOR@
+#define YANS_UI_VERSION_MINOR @YANS_UI_VERSION_MINOR@
+#define YANS_UI_VERSION @YANS_UI_VERSION@
+
+#endif // YANS_UI_CONFIG_H_

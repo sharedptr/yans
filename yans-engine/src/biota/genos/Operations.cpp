@@ -7,7 +7,7 @@
 #include <cassert>
 #include <limits>
 
-YANS_NS_B2( biota, genos )
+YANS_ENS_B2( biota, genos )
 
 Operations::Operations()
     : m_Device(),
@@ -77,4 +77,4 @@ Allele&& Operations::crossover( const Allele& a, const Allele& b ) noexcept
     return std::move( result );
 }
 
-YANS_NS_E2( biota, genos )
+YANS_ENS_E2( biota, genos )

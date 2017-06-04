@@ -1,18 +1,20 @@
-#include "LogoRenderer.h"
+#include "GameRenderer.h"
 
 #include <QMatrix4x4>
 
 #include <cmath>
 
-LogoRenderer::LogoRenderer() : m_GLInit( false )
+YANS_UNS_B2( render, detail )
+
+GameRenderer::GameRenderer() : m_GLInit( false )
 {
 }
 
-LogoRenderer::~LogoRenderer()
+GameRenderer::~GameRenderer()
 {
 }
 
-void LogoRenderer::paintQtLogo()
+void GameRenderer::paintQtLogo()
 {
     m_ShaderProgram.enableAttributeArray( normalAttr1 );
     m_ShaderProgram.enableAttributeArray( vertexAttr1 );
@@ -23,7 +25,7 @@ void LogoRenderer::paintQtLogo()
     m_ShaderProgram.disableAttributeArray( vertexAttr1 );
 }
 
-void LogoRenderer::render()
+void GameRenderer::render()
 {
     beforeRender();
 
@@ -44,7 +46,7 @@ void LogoRenderer::render()
     afterRender();
 }
 
-void LogoRenderer::createGeometry()
+void GameRenderer::createGeometry()
 {
     m_Vertices.clear();
     m_Normals.clear();
@@ -92,13 +94,13 @@ void LogoRenderer::createGeometry()
         extrude( x8, y8, x5, y5 );
     }
 
-    for( auto &vertex : m_Vertices )
+    for( auto& vertex : m_Vertices )
     {
         vertex *= 2.0f;
     }
 }
 
-void LogoRenderer::quad( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat x3, GLfloat y3, GLfloat x4,
+void GameRenderer::quad( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat x3, GLfloat y3, GLfloat x4,
                          GLfloat y4 )
 {
     m_Vertices << QVector3D( x1, y1, -0.05f );
@@ -138,7 +140,7 @@ void LogoRenderer::quad( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat
     m_Normals << n;
 }
 
-void LogoRenderer::extrude( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 )
+void GameRenderer::extrude( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 )
 {
     m_Vertices << QVector3D( x1, y1, +0.05f );
     m_Vertices << QVector3D( x2, y2, +0.05f );
@@ -159,12 +161,12 @@ void LogoRenderer::extrude( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 )
     m_Normals << n;
 }
 
-void LogoRenderer::initialize()
+void GameRenderer::initialize()
 {
     glClearColor( 0.1f, 0.1f, 0.2f, 1.0f );
 
-    QOpenGLShader *vshader1 = new QOpenGLShader( QOpenGLShader::Vertex, &m_ShaderProgram );
-    const char *vsrc1 = "attribute highp vec4 vertex;\n"
+    QOpenGLShader* vshader1 = new QOpenGLShader( QOpenGLShader::Vertex, &m_ShaderProgram );
+    const char* vsrc1 = "attribute highp vec4 vertex;\n"
                         "attribute mediump vec3 normal;\n"
                         "uniform mediump mat4 matrix;\n"
                         "varying mediump vec4 color;\n"
@@ -179,8 +181,8 @@ void LogoRenderer::initialize()
                         "}\n";
     vshader1->compileSourceCode( vsrc1 );
 
-    QOpenGLShader *fshader1 = new QOpenGLShader( QOpenGLShader::Fragment, &m_ShaderProgram );
-    const char *fsrc1 = "varying mediump vec4 color;\n"
+    QOpenGLShader* fshader1 = new QOpenGLShader( QOpenGLShader::Fragment, &m_ShaderProgram );
+    const char* fsrc1 = "varying mediump vec4 color;\n"
                         "void main(void)\n"
                         "{\n"
                         "    gl_FragColor = color;\n"
@@ -205,7 +207,7 @@ void LogoRenderer::initialize()
     m_GLInit = true;
 }
 
-void LogoRenderer::beforeRender()
+void GameRenderer::beforeRender()
 {
     if( Q_UNLIKELY( !m_GLInit ) )
     {
@@ -226,8 +228,10 @@ void LogoRenderer::beforeRender()
     glEnable( GL_DEPTH_TEST );
 }
 
-void LogoRenderer::afterRender()
+void GameRenderer::afterRender()
 {
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
 }
+
+YANS_UNS_E2( render, detail )
