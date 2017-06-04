@@ -6,8 +6,6 @@
 
 #include "biota/genos/TypeGene.h"
 
-#include <cstdint>
-
 YANS_NS_B2( biota, genos )
 
 class YANS_ENGINE_EXPORT Gene
@@ -15,23 +13,23 @@ class YANS_ENGINE_EXPORT Gene
 public:
     friend class Operations;
 
-    enum class Power : std::uint8_t
+    enum class Power : quint8
     {
         Dominant = 0,
         Recessive = 1
     };
 
 public:
-    Gene( TypeGene type, Power power, std::uint8_t info = 0 );
+    Gene( TypeGene type, Power power, quint8 info = 0 );
 
     TypeGene type() const noexcept;
     Power power() const noexcept;
-    std::uint8_t information() const noexcept;
+    quint8 information() const noexcept;
 
 private:
     TypeGene m_Type;
     Power m_Power;
-    std::uint8_t m_Information;
+    quint8 m_Information;
 };
 
 YANS_NS_E2( biota, genos )

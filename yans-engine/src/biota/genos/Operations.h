@@ -4,7 +4,6 @@
 
 #include "yans-engine.h"
 
-#include <cstdint>
 #include <random>
 
 YANS_NS_B2( biota, genos )
@@ -25,7 +24,7 @@ private:
     std::random_device m_Device;
     std::mt19937 m_Generator;
     std::uniform_real_distribution< double > m_DistribMutation;
-    std::uniform_int_distribution< std::uint8_t > m_DistribGeneValue;
+    std::uniform_int_distribution< quint8 > m_DistribGeneValue;
 
     Gene& mutation( Gene& a ) noexcept;
     Allele&& crossover( const Allele& a, const Allele& b ) noexcept;

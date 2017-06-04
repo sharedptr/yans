@@ -2,8 +2,7 @@
 
 YANS_NS_B2( biota, genos )
 
-Gene::Gene( TypeGene type, Gene::Power power, std::uint8_t info )
-    : m_Type( type ), m_Power( power ), m_Information( info )
+Gene::Gene( TypeGene type, Gene::Power power, quint8 info ) : m_Type( type ), m_Power( power ), m_Information( info )
 {
 }
 
@@ -17,7 +16,7 @@ Gene::Power Gene::power() const noexcept
     return m_Power;
 }
 
-std::uint8_t Gene::information() const noexcept
+quint8 Gene::information() const noexcept
 {
     return m_Information;
 }

@@ -10,17 +10,22 @@
 
 YANS_NS_B2( biota, genos )
 
+using AllelesList = std::vector< Allele >;
+
 class YANS_ENGINE_EXPORT Genotype
 {
 public:
     friend class Operations;
 
-    Genotype( const std::vector< Allele >& alleles );
+    Genotype( const AllelesList& alleles );
+
+    const AllelesList& alleles() const noexcept;
 
 private:
-    std::vector< Allele > m_Alleles;
+    AllelesList m_Alleles;
+    bool m_IsLifable;
 
-    Genotype* m_Species;
+    // Genotype* m_Species;
 };
 
 YANS_NS_E2( biota, genos )

@@ -4,14 +4,12 @@
 
 #include "yans-engine.h"
 
-#include <cstdint>
-
 YANS_NS_B2( biota, genos )
 
 /**
  * @brief Type of genetic information about phenotype
  */
-enum class TypeGene : std::uint8_t
+enum class TypeGene : quint8
 {
     Aggressiveness = 0,
     BodySize,
