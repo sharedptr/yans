@@ -20,6 +20,8 @@ configure_file( qmldir.in
 
 find_package( Qt5 COMPONENTS Core Gui Quick REQUIRED )
 
+qt5_add_resources( YANS_UI_RESOURCES shaders.qrc )
+
 include( cmake/source.cmake )
 
 list( APPEND YANS_UI_HEADERS
@@ -29,6 +31,7 @@ list( APPEND YANS_UI_HEADERS
 add_library( ${PROJECT_NAME} SHARED
     ${YANS_UI_SOURCES}
     ${YANS_UI_HEADERS}
+    ${YANS_UI_RESOURCES}
 )
 
 target_compile_definitions( ${PROJECT_NAME}
